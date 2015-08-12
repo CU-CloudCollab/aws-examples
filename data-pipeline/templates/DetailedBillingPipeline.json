@@ -1,0 +1,155 @@
+{
+  "objects": [
+    {
+      "period": "1 days",
+      "name": "Every 1 day",
+      "id": "DefaultSchedule",
+      "type": "Schedule",
+      "startAt": "FIRST_ACTIVATION_DATE_TIME"
+    },
+    {
+      "output": {
+        "ref": "DataNodeId_CPG77"
+      },
+      "input": {
+        "ref": "S3StagingDataNode"
+      },
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "name": "CopyDataToMySql",
+      "runsOn": {
+        "ref": "Ec2Instance"
+      },
+      "id": "ActivityId_aQGRE",
+      "type": "CopyActivity"
+    },
+    {
+      "input": {
+        "ref": "S3StagingDataNode"
+      },
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "dependsOn": {
+        "ref": "ActivityId_aQGRE"
+      },
+      "stage": "false",
+      "name": "S3StagingCleanupActivity",
+      "runsOn": {
+        "ref": "Ec2Instance"
+      },
+      "id": "ActivityId_X3G5r",
+      "type": "ShellCommandActivity",
+      "command": "(sudo yum -y update aws-cli) && (aws s3 rm #{input.directoryPath} --recursive)"
+    },
+    {
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "database": {
+        "ref": "DatabaseId_c4EOt"
+      },
+      "name": "DeleteOldData",
+      "id": "ActivityId_Wu45g",
+      "runsOn": {
+        "ref": "Ec2Instance"
+      },
+      "type": "SqlActivity",
+      "script": "delete from current_month"
+    },
+    {
+      "connectionString": "jdbc:mysql://billing-detail.something.us-east-1.rds.amazonaws.com/billing_detail",
+      "*password": "*******",
+      "name": "billing_db",
+      "id": "DatabaseId_c4EOt",
+      "type": "JdbcDatabase",
+      "jdbcDriverClass": "com.mysql.jdbc.Driver",
+      "username": "user"
+    },
+    {
+      "directoryPath": "#{myS3BillingLogLoc}",
+      "name": "S3InputDataNode",
+      "id": "S3InputDataNode",
+      "type": "S3DataNode"
+    },
+    {
+      "directoryPath": "#{myS3StagingLoc}#{format(@scheduledStartTime, 'YYYY-MM-dd-HH-mm-ss')}",
+      "name": "S3StagingDataNode",
+      "id": "S3StagingDataNode",
+      "type": "S3DataNode"
+    },
+    {
+      "subnetId": "subnet-3022bc47",
+      "securityGroupIds": "sg-49ee532d",
+      "name": "Ec2Instance",
+      "id": "Ec2Instance",
+      "type": "Ec2Resource",
+      "terminateAfter": "2 Hours"
+    },
+    {
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "database": {
+        "ref": "DatabaseId_c4EOt"
+      },
+      "createTableSql": "CREATE TABLE IF NOT EXISTS #{table} (invoice_id varchar(255), payer_account_id varchar(255), linked_account_id varchar(255), record_type varchar(255), record_id varchar(255), product_name varchar(255), rate_id varchar(255), subscription_id varchar(255), pricing_plan_id varchar(255), usage_type varchar(255), operation varchar(255), availability_zone varchar(255), reserved_instance varchar(255), item_description varchar(255), usage_start_date varchar(255), usage_end_date varchar(255), usage_quantity FLOAT, blended_rate FLOAT, blended_cost FLOAT, unblended_rate FLOAT, unblended_cost FLOAT, resource_id varchar(255), cost_center varchar(255))",
+      "name": "BillingData",
+      "insertQuery": "INSERT INTO #{table} (invoice_id, payer_account_id, linked_account_id, record_type, record_id, product_name, rate_id, subscription_id, pricing_plan_id, usage_type, operation, availability_zone, reserved_instance, item_description, usage_start_date, usage_end_date, usage_quantity, blended_rate, blended_cost, unblended_rate, unblended_cost, resource_id, cost_center) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "id": "DataNodeId_CPG77",
+      "type": "SqlDataNode",
+      "table": "current_month"
+    },
+    {
+      "failureAndRerunMode": "CASCADE",
+      "schedule": {
+        "ref": "DefaultSchedule"
+      },
+      "resourceRole": "DataPipelineDefaultResourceRole",
+      "role": "DataPipelineDefaultRole",
+      "scheduleType": "cron",
+      "name": "Default",
+      "id": "Default"
+    },
+    {
+      "name": "OutputDataType",
+      "id": "OutputDataType",
+      "type": "CSV"
+    },
+    {
+      "output": {
+        "ref": "S3StagingDataNode"
+      },
+      "input": {
+        "ref": "S3InputDataNode"
+      },
+      "stage": "true",
+      "name": "ZipFormatConversionActivity",
+      "id": "ZipFormatConversionActivity",
+      "runsOn": {
+        "ref": "Ec2Instance"
+      },
+      "type": "ShellCommandActivity",
+      "command": "for fname in $(find ${INPUT1_STAGING_DIR} -name *aws-billing-detailed-line-items-with-resources-and-tags-#{format(@scheduledStartTime, 'YYYY-MM')}.csv.zip); do unzip -p $fname > ${OUTPUT1_STAGING_DIR}/$(basename ${fname//.csv.zip/.csv}); done ;"
+    }
+  ],
+  "parameters": [
+    {
+      "helpText": "S3 folder that has the monthly AWS detailed billing report files with a .csv.zip format.",
+      "description": "Input S3 folder for billing report",
+      "id": "myS3BillingLogLoc",
+      "type": "AWS::S3::ObjectKey"
+    },
+    {
+      "helpText": "Folder to store the unzipped CSV file before loading to Redshift. The S3 folder must be in the same region as the Redshift cluster.",
+      "description": "S3 staging folder",
+      "id": "myS3StagingLoc",
+      "type": "AWS::S3::ObjectKey"
+    }
+  ],
+  "values": {
+    "myS3StagingLoc": "s3://ec2-usage-data-staging/",
+    "myS3BillingLogLoc": "s3://ec2-usage-data/"
+  }
+}
