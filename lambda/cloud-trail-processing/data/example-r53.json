@@ -1,0 +1,68 @@
+{
+  "Records":[
+    {
+      "eventVersion": "1.03",
+      "userIdentity": {
+        "type": "AssumedRole",
+        "principalId": "AROAICCPMY7VALLFYHWPA:srb55@cornell.edu",
+        "arn": "arn:aws:sts::225162606092:assumed-role/shib-admin/srb55@cornell.edu",
+        "accountId": "225162606092",
+        "accessKeyId": "ASIAIHYGW4LA27JY5E3A",
+        "sessionContext": {
+          "attributes": {
+            "mfaAuthenticated": "false",
+            "creationDate": "2015-11-26T02:50:50Z"
+          },
+          "sessionIssuer": {
+            "type": "Role",
+            "principalId": "AROAICCPMY7VALLFYHWPA",
+            "arn": "arn:aws:iam::225162606092:role/shib-admin",
+            "accountId": "225162606092",
+            "userName": "shib-admin"
+          }
+        }
+      },
+      "eventTime": "2015-11-26T02:52:03Z",
+      "eventSource": "route53.amazonaws.com",
+      "eventName": "ChangeResourceRecordSets",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "74.65.115.91",
+      "userAgent": "console.amazonaws.com",
+      "requestParameters": {
+        "changeBatch": {
+          "changes": [
+            {
+              "action": "CREATE",
+              "resourceRecordSet": {
+                "type": "TXT",
+                "name": "test-text.cs.cucloud.net.",
+                "resourceRecords": [
+                  {
+                    "value": "\"test\""
+                  }
+                ],
+                "tTL": 300
+              }
+            }
+          ]
+        },
+        "hostedZoneId": "Z1K86BI6YYEXQK"
+      },
+      "responseElements": {
+        "changeInfo": {
+          "submittedAt": "Nov 26, 2015 2:52:03 AM",
+          "status": "PENDING",
+          "id": "/change/C1LNCNIXZBRW5E"
+        }
+      },
+      "additionalEventData": {
+        "Note": "Do not use to reconstruct hosted zone"
+      },
+      "requestID": "ac1549a1-93e8-11e5-853f-0b7d26528b7c",
+      "eventID": "893caea3-6941-415c-8a10-d1e67084646e",
+      "eventType": "AwsApiCall",
+      "apiVersion": "2013-04-01",
+      "recipientAccountId": "225162606092"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "cloud-trail-processing",
+  "version": "1.0.0",
+  "description": "Example of processing cloud trail data using Lambda",
+  "main": "CloudTrailEventProcessing.js",
+  "dependencies": {
+    "async": "^1.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
