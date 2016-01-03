@@ -6,7 +6,7 @@ var EVENT_SOURCE_TO_TRACK = /route53.amazonaws.com/;
 var EVENT_NAME_TO_TRACK   = /ChangeResourceRecordSets/;
 var ALLOWED_TYPES = /A|AAA|CNAME/;
 var DEFAULT_SNS_REGION  = 'us-east-1';
-var SNS_TOPIC_ARN       = 'arn:aws:sns:us-east-1:225162606092:cloud-trail-alerts';
+var SNS_TOPIC_ARN       = 'arn:aws:sns:us-east-1:111111111111:cloud-trail-alerts';
 
 var s3 = new aws.S3();
 var route53 = new aws.Route53({apiVersion: '2013-04-01'});
