@@ -81,3 +81,28 @@ date you can can simply deploy the function with:
 grunt deploy
 ```
 
+### Restore example
+
+There is an example restore function in restore.js.  Example usage
+
+```
+./restore.js -b ccu-dynamo-backups -s alarms -t alarms1
+```
+
+The usage is:
+
+```
+[dynamodb-backup (master)]$ ./restore.js -h
+
+  Usage: restore [options]
+
+  Options:
+
+    -h, --help                     output usage information
+    -b, --bucketname <bucketname>  The name of the s3 bucket to restore from
+    -t, --target <target>          The name of the table to create
+    -s, --source <source>          The name of source file
+
+```
+
+All the options are required.  The source is the directory and name of the backup file.  The target is the name of the table to restore the data to.
