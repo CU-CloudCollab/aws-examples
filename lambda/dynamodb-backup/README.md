@@ -1,0 +1,83 @@
+# DyanmoDB Backup
+
+### 0. Create zip to upload
+
+1. grunt lambda_package
+2. Zip will be created under the dist folder
+
+### 1. Create a lambda function
+
+1. Within lambda, press the 'Create a Lambda Function' button
+2. Press the 'Skip' button to bypass the suggested blueprints
+3. Enter the lambda function name DyanmoBackup
+4. Select 'Node.js' as the Runtime
+5. Upload the zip 
+6. Under 'Handler' add 'Index.handler'
+
+More [documentation on Lambda](https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html)
+
+### 2. Configure the access policy for your lambda role
+
+Your lambda function will run as an IAM role.  This is where we configure the permissions required.
+
+#### Lambda function master policy
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "arn:aws:logs:*:*:*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:ListTables",
+                "dynamodb:DescribeTable",
+                "dynamodb:Query",
+                "dynamodb:Scan"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
+```
+
+This contains permissions for:
+
+1. Saving logs for your lambda execution.
+2. Stroring zipped dynamo backups from dynamo to S3.
+3. List dynamo tables and get dynamo data
+
+### Using Grunt
+
+You can use grunt to invoke, pacakge and deploy the lambda function.  To test the function from the command line run:
+
+```
+grunt lambda_invoke
+```
+
+Once the lambda function has been created update Gruntfile.js with the arn of the function.  Once Gruntfile.js is up to 
+date you can can simply deploy the function with:
+
+```
+grunt deploy
+```
+
