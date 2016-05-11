@@ -16,6 +16,6 @@ TARGET_ACCOUNT=123456789012
 cp assume-role-policy.json /tmp/assume-role-policy.json
 sed -ie "s/ACCOUNT_PLACEHOLDER/$TARGET_ACCOUNT/g" /tmp/assume-role-policy.json
 
-aws iam create-role --role-name $ROLE_NAME --assume-role-policy-document file:///tmp/assume-role-policy.json --profile training
+aws iam create-role --role-name $ROLE_NAME --assume-role-policy-document file:///tmp/assume-role-policy.json
 
-aws iam attach-role-policy --role-name $ROLE_NAME --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess --profile training
+aws iam attach-role-policy --role-name $ROLE_NAME --policy-arn arn:aws:iam::aws:policy/ReadOnlyAccess
