@@ -4,14 +4,9 @@
     {
       "Effect": "Allow",
       "Principal": {
-        "Federated": "arn:aws:iam::ACCOUNT_PLACEHOLDER:saml-provider/cornell_idp"
+        "AWS": "arn:aws:iam::ACCOUNT_PLACEHOLDER:role/shib-admin"
       },
-      "Action": "sts:AssumeRoleWithSAML",
-      "Condition": {
-        "StringEquals": {
-          "SAML:aud": "https://signin.aws.amazon.com/saml"
-        }
-      }
+      "Action": "sts:AssumeRole"
     }
   ]
 }

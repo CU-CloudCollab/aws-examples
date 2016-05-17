@@ -1,2 +1,4 @@
 node_modules
 CloudTrailEventProcessing.zip
+.DS_Store
+*/.DS_Store
