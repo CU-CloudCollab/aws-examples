@@ -18,7 +18,7 @@ require 'aws-sdk'
 @iam = Aws::IAM::Client.new
 
 resp = @iam.update_account_password_policy({
-  minimum_password_length: 8,
+  minimum_password_length: 14,
   require_symbols: true,
   require_numbers: true,
   require_uppercase_characters: true,
