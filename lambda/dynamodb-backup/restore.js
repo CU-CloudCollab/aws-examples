@@ -62,13 +62,16 @@ async.waterfall([
     delete params["TableStatus"];
     delete params["ProvisionedThroughput"]["NumberOfDecreasesToday"];
 
-    params["GlobalSecondaryIndexes"].forEach(function(gsi) {
-      delete gsi["IndexSizeBytes"];
-      delete gsi["ItemCount"];
-      delete gsi["IndexArn"];
-      delete gsi["IndexStatus"];
-      delete gsi["ProvisionedThroughput"]["NumberOfDecreasesToday"];
-    });
+
+	if(params.hasOwnProperty("GlobalSecondaryIndexes")) {
+      params["GlobalSecondaryIndexes"].forEach(function(gsi) {
+        delete gsi["IndexSizeBytes"];
+        delete gsi["ItemCount"];
+        delete gsi["IndexArn"];
+        delete gsi["IndexStatus"];
+        delete gsi["ProvisionedThroughput"]["NumberOfDecreasesToday"];
+      });
+	}
 
     dynamo.createTable(params, next);
   },
