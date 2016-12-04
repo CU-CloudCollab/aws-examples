@@ -5,7 +5,7 @@ var zlib = require('zlib');
 var async = require('async');
 
 var dateFormat = require('dateformat');
-var ts = dateFormat(new Date(), "mmddyyyy-hhMMss")
+var ts = dateFormat(new Date(), "mmddyyyy-HHMMss")
 
 aws.config.update({ region: 'us-east-1' });
 dynamo = new aws.DynamoDB();
