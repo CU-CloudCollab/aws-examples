@@ -11,7 +11,7 @@
 # 2) At command line: ./grant-ro-access.sh.
 
 ROLE_NAME=cit-cloud-team-ro
-TARGET_ACCOUNT=123456789012
+TARGET_ACCOUNT=225162606092
 
 cp assume-role-policy.json /tmp/assume-role-policy.json
 sed -ie "s/ACCOUNT_PLACEHOLDER/$TARGET_ACCOUNT/g" /tmp/assume-role-policy.json

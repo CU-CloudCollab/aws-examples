@@ -1,0 +1,25 @@
+{
+    "computeEnvironmentName": "normal",
+    "type": "MANAGED",
+    "state": "ENABLED",
+    "computeResources": {
+        "type": "EC2",
+        "minvCpus": 0,
+        "maxvCpus": 256,
+        "desiredvCpus": 2,
+        "instanceTypes": [
+            "optimal"
+        ],
+        "subnets": [
+            "",
+            ""
+        ],
+        "securityGroupIds": [
+            "",
+            ""
+        ],
+        "instanceRole": "",
+        "tags": { }
+    },
+    "serviceRole": ""
+}
