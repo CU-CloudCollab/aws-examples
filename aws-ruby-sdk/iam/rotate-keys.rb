@@ -43,7 +43,7 @@ config.groups.each do |group|
   new_secret_access_key = resp.access_key.secret_access_key
 
   # give time for the new credentials to become active
-  sleep 5
+  sleep 15
 
   # use the new credentials to delete the old credentials to ensure they are working
   puts "\tusing new keys for #{user}..."
