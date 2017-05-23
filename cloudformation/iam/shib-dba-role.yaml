@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Create a role for DBAs that can be assumed with Cornell Shibboleth. See
+  https://confluence.cornell.edu/display/CLOUD/Creating+Custom+Roles+to+use+With+Shibboleth
+Resources:
+  DBARole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "shib-dba"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+                Federated: !Join [ "", [ "arn:aws:iam::", !Ref "AWS::AccountId", ":saml-provider/cornell_idp" ] ]
+            Action: "sts:AssumeRoleWithSAML"
+            Condition:
+              StringEquals:
+                SAML:aud: "https://signin.aws.amazon.com/saml"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+      Policies:
+        -
+          PolicyName: "SecurityGroupFullControl"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "ec2:AuthorizeSecurityGroupEgress"
+                  - "ec2:AuthorizeSecurityGroupIngress"
+                  - "ec2:CreateSecurityGroup"
+                  - "ec2:CreateTags"
+                  - "ec2:DeleteSecurityGroup"
+                  - "ec2:RevokeSecurityGroupEgress"
+                  - "ec2:RevokeSecurityGroupIngress"
+                Resource: !Join [ "", [ "arn:aws:ec2:us-east-1:", !Ref "AWS::AccountId", ":security-group/dba-*" ] ]
+        -
+          PolicyName: "TagsFullControl"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "ec2:CreateTags"
+                  - "ec2:DeleteTags"
+                  - "ec2:DecribeTags"
+                Resource: !Join [ "", [ "arn:aws:ec2:us-east-1:", !Ref "AWS::AccountId", ":*" ] ]
