@@ -1,0 +1,146 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+
+    "Description": "Create an EFS volume, mount points in two subnets, security group to access the volume. Also tags the volume based on applicatio name and environment.",
+
+    "Parameters": {
+        "vpcID": {
+            "Type": "AWS::EC2::VPC::Id",
+            "Description": "VPC Id",
+            "Default": "vpc-6c8b040b"
+        },
+        "privateSubnetAZ1": {
+            "Type": "AWS::EC2::Subnet::Id",
+            "Description": "ID of private subnet in first AZ.",
+            "Default": "subnet-48577e10"
+        },
+        "privateSubnetAZ2": {
+            "Type": "AWS::EC2::Subnet::Id",
+            "Description": "ID of private subnet in second AZ.",
+            "Default": "subnet-5be8ef66"
+        },
+        "applicationName": {
+            "Type": "String",
+            "Default": "boomi",
+            "Description": "Application name. E.g., boomi, jadu, jira"
+        },
+        "environmentTag": {
+            "Type": "String",
+            "Default": "test",
+            "Description": "Environment: dev, test, dev/test, prod"
+        }
+    },
+
+    "Mappings": {},
+
+    "Conditions": {},
+
+    "Resources": {
+
+        "mountTargetSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "vpcID"
+                },
+                "GroupDescription": "Security group for mount target",
+                "Tags" :  [
+                  {
+                    "Key": "Name",
+                    "Value":
+                      { "Fn::Join" : [ "-", [ { "Ref" : "applicationName" }, { "Ref" : "environmentTag" }, "efs", "sg" ] ] }
+                  },
+                  {
+                    "Key": "Environment",
+                    "Value": { "Ref" : "environmentTag" }
+                  },
+                  {
+                    "Key": "Application",
+                    "Value": { "Ref" : "applicationName" }
+                  }
+                ]
+            }
+        },
+
+        "securityGroupIngress": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": {
+                "GroupId": {
+                    "Ref": "mountTargetSecurityGroup"
+                },
+                "IpProtocol": "tcp",
+                "ToPort": "2049",
+                "FromPort": "2049",
+                "SourceSecurityGroupId": {
+                    "Ref": "mountTargetSecurityGroup"
+                }
+            }
+        },
+
+        "fileSystem": {
+            "Type": "AWS::EFS::FileSystem",
+            "Properties": {
+                "FileSystemTags": [
+                  {
+                    "Key": "Name",
+                    "Value":
+                      { "Fn::Join" : [ "-", [ { "Ref" : "applicationName" }, { "Ref" : "environmentTag" }, "efs" ] ] }
+                  },
+                  {
+                    "Key": "Environment",
+                    "Value": { "Ref" : "environmentTag" }
+                  },
+                  {
+                    "Key": "Application",
+                    "Value": { "Ref" : "applicationName" }
+                  }
+                ]
+            }
+        },
+
+        "mountTargetAZ1": {
+            "Type": "AWS::EFS::MountTarget",
+            "Properties": {
+                "FileSystemId": {
+                    "Ref": "fileSystem"
+                },
+                "SubnetId": {
+                    "Ref": "privateSubnetAZ1"
+                },
+                "SecurityGroups": [{
+                    "Ref": "mountTargetSecurityGroup"
+                }]
+            }
+        },
+
+        "mountTargetAZ2": {
+            "Type": "AWS::EFS::MountTarget",
+            "Properties": {
+                "FileSystemId": {
+                    "Ref": "fileSystem"
+                },
+                "SubnetId": {
+                    "Ref": "privateSubnetAZ2"
+                },
+                "SecurityGroups": [{
+                    "Ref": "mountTargetSecurityGroup"
+                }]
+            }
+        }
+    },
+
+    "Outputs": {
+        "OutputFileSystemId": {
+            "Description": "Id of newly created Elastic File System",
+            "Value": {
+                "Ref": "fileSystem"
+            }
+        },
+        "OutputSecurityGroup": {
+            "Description": "Add instances that need access to the EFS to this security group",
+            "Value": {
+                "Ref": "mountTargetSecurityGroup"
+            }
+        }
+    }
+}
