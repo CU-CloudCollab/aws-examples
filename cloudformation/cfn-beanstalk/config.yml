@@ -1,0 +1,62 @@
+# General
+
+appname: 'SandboxApp'
+keypair: 'mjs472-sandbox'
+vpc: 'vpc-71070114'
+asgSubnets: 'subnet-7704a001,subnet-dd8519f6'
+elbSubnets: 'subnet-8d95c4fa,subnet-8e618aa4'
+solutionStack: '64bit Amazon Linux 2017.03 v2.6.0 running Multi-container Docker 1.12.6 (Generic)'
+
+# Custom Global EB Option Settings
+# http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options.html
+
+namespaces:
+
+        aws:ec2:vpc:
+                AssociatePublicIpAddress: 'false'
+
+        aws:autoscaling:asg:
+                Availability Zones: 'Any'
+                MinSize: '1'
+                MaxSize: '2'
+
+        aws:autoscaling:launchconfiguration:
+                RootVolumeType: 'gp2'
+                RootVolumeSize: '10'
+                
+
+environments: # Environment Specific Settings
+
+        Test:
+                kms-key-id: 'f000ed77-9124-437a-988c-01c830004719'
+
+                containerEnv:
+                        KMS_KEY_ID: 'f000ed77-9124-437a-988c-01c830004719'
+                        SECRET_PASSWORD: 'kms_encrypted_password_test'
+
+                tags:
+                        AWSResourceTag: 'TagValue' # Application & Environment Tags set automatically
+                        
+                namespaces: # Custom Environment EB Option Settings 
+
+                        aws:autoscaling:launchconfiguration:
+                                InstanceType: 't2.micro'
+
+        Prod:
+                kms-key-id: 'f000ed77-9124-437a-988c-01c830004719'
+
+                containerEnv:
+                        KMS_KEY_ID: 'f000ed77-9124-437a-988c-01c830004719'
+                        SECRET_PASSWORD: 'kms_encrypted_password_prod'
+
+                tags:
+                        AWSResourceTag: 'TagValue' # Application & Environment Tags set automatically
+
+                namespaces: 
+
+                        aws:autoscaling:launchconfiguration:
+                                InstanceType: 't2.medium'
+
+
+
+
