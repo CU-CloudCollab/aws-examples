@@ -1,0 +1,123 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+
+    "Description": "Create KMS key for an application, and setup admin/use policies for it.",
+
+    "Metadata": {
+        "Sample": {
+            "Description": "This is a sample metadata entry."
+        }
+    },
+
+    "Parameters": {
+        "keyName": {
+            "Type": "String",
+            "Default": "petshop-encryption-key",
+            "Description": "Alias or name of the key."
+        },
+        "iamUser": {
+            "Type": "String",
+            "Default": "pea1",
+            "Description": "Name of an IAM user allowed to use this key."
+        },
+        "iamRole": {
+            "Type": "String",
+            "Default": "petshop-elasticbeanstalk-ec2-role",
+            "Description": "Name of an IAM instance profile allowed to use this key."
+        },
+        "jenkinsRole": {
+            "Type": "String",
+            "Default": "Jenkins",
+            "Description": "Name of an the IAM instance profile used by Jenkins instances."
+        },
+    },
+
+    "Mappings": {},
+
+    "Conditions": {},
+
+    "Resources": {
+
+        "kmsKey": {
+            "Type": "AWS::KMS::Key",
+            "Properties": {
+                "Description": "application-specific KMS key for the petshop application.",
+                "Enabled": "true",
+                "EnableKeyRotation": "true",
+                "KeyPolicy": {
+                    "Version": "2012-10-17",
+                    "Id": "key-default-1",
+                    "Statement": [{
+                        "Sid": "Allow administration of the key",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": { "Fn::Join" : [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" } , ":role/shib-admin" ] ] }
+                        },
+                        "Action": [
+                            "kms:Create*",
+                            "kms:Describe*",
+                            "kms:Enable*",
+                            "kms:List*",
+                            "kms:Put*",
+                            "kms:Update*",
+                            "kms:Revoke*",
+                            "kms:Disable*",
+                            "kms:Get*",
+                            "kms:Delete*",
+                            "kms:ScheduleKeyDeletion",
+                            "kms:CancelKeyDeletion"
+                        ],
+                        "Resource": "*"
+                    }, {
+                        "Sid": "Allow use of the key",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "AWS": [
+                                { "Fn::Join": [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" } , ":user/", { "Ref": "iamUser" } ] ] },
+                                { "Fn::Join": [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" } , ":role/", { "Ref": "iamRole" } ] ] },
+                                { "Fn::Join": [ "", [ "arn:aws:iam::", { "Ref": "AWS::AccountId" } , ":role/", { "Ref": "jenkinsRole" } ] ] }
+                            ]
+                        },
+                        "Action": [
+                            "kms:Encrypt",
+                            "kms:Decrypt",
+                            "kms:ReEncrypt*",
+                            "kms:GenerateDataKey*",
+                            "kms:DescribeKey"
+                        ],
+                        "Resource": "*"
+                    }]
+                }
+            }
+        },
+
+        "kmsKeyAlias": {
+            "Type": "AWS::KMS::Alias",
+            "Properties": {
+                "AliasName": {
+                    "Fn::Join": ["", ["alias/", {
+                        "Ref": "keyName"
+                    }]]
+                },
+                "TargetKeyId": {
+                    "Ref": "kmsKey"
+                }
+            }
+        }
+    },
+
+    "Outputs": {
+        "outputKMSKeyId": {
+            "Description": "Id of newly created KMS key",
+            "Value": {
+                "Ref": "kmsKey"
+            }
+        },
+        "OutputKMSKeyName": {
+            "Description": "Alias for the new key",
+            "Value": {
+                "Ref": "kmsKeyAlias"
+            }
+        }
+    }
+  }
