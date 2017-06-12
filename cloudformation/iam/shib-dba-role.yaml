@@ -30,14 +30,19 @@ Resources:
               -
                 Effect: "Allow"
                 Action:
+                  - "ec2:CreateSecurityGroup"
+                  - "ec2:DescribeSecurityGroup"
+                  - "ec2:DescribeVpcs"
+                Resource: "*"
+              -
+                Effect: "Allow"
+                Action:
                   - "ec2:AuthorizeSecurityGroupEgress"
                   - "ec2:AuthorizeSecurityGroupIngress"
-                  - "ec2:CreateSecurityGroup"
-                  - "ec2:CreateTags"
                   - "ec2:DeleteSecurityGroup"
                   - "ec2:RevokeSecurityGroupEgress"
                   - "ec2:RevokeSecurityGroupIngress"
-                Resource: !Join [ "", [ "arn:aws:ec2:us-east-1:", !Ref "AWS::AccountId", ":security-group/*" ] ]
+                Resource: !Join [ "", [ "arn:aws:ec2:us-east-1:", !Ref "AWS::AccountId", ":*" ] ]
         -
           PolicyName: "TagsFullControl"
           PolicyDocument:
