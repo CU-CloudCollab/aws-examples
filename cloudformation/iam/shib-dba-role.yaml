@@ -55,3 +55,17 @@ Resources:
                   - "ec2:DeleteTags"
                   - "ec2:DecribeTags"
                 Resource: !Join [ "", [ "arn:aws:ec2:us-east-1:", !Ref "AWS::AccountId", ":*" ] ]
+        -
+          PolicyName: "CloudwatchAlarmsFullControl"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "cloudwatch:DisableAlarmActions"
+                  - "cloudwatch:EnableAlarmActions"
+                  - "cloudwatch:PutMetricAlarm"
+                  - "cloudwatch:SetAlarmState"
+                  - "cloudwatch:DeleteAlarms"
+                Resource: "*"
