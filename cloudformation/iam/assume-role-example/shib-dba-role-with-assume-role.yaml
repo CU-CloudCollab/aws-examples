@@ -5,15 +5,19 @@ Description: >
   The role can also be assumed by the role given as parameter, even when that role
   is from another AWS account.
 Parameters:
+  NameOfRoleToBeCreated:
+    Type: String
+    Default: shib-dba
+    Description: The name of the role to be created by this template. To work with Cornell Shibboleth, it must be of the form "shib-XXXX" where XXXX consists of only numbers and letters.
   ArnOfRoleToBeAllowedToAssumeShibDba:
     Type: String
     Default: arn:aws:iam::111111111111:role/example-role
-    Description: The ARN of the role that you wish to allow to assume the shib-dba role. This role can be from a different AWS account altogether.
+    Description: The ARN of the role that you wish to allow to assume the role created by this template. This role can be from a different AWS account altogether.
 Resources:
   DBARole:
     Type: "AWS::IAM::Role"
     Properties:
-      RoleName: "shib-dba"
+      RoleName: !Ref NameOfRoleToBeCreated
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
