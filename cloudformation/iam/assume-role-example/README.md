@@ -49,8 +49,7 @@ This example can be used to specifically create the following resources:
     $ wget https://raw.githubusercontent.com/CU-CommunityApps/aws-examples/master/cloudformation/iam/assume-role-example/assume-role.sh
     $ chmod +x assume-role.sh
     ```
-    3. Change the value of the ASSUME_ROLE variable to the ARN of the `shib-dba` role above.
-      * Use nano, or your favorite linux editor to do this.
+    3. Change the value of the ASSUME_ROLE variable to the ARN of the `shib-dba` role above. Use nano, or your favorite linux editor to do this.
     4. Run the script
     ```
     $ ./assume-role.sh
