@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Create a role (instance profile) that will be allowed to assume a role in a different account. This template should be run in the home account.
+Parameters:
+  RoleNameToBeCreated:
+    Type: String
+    Default: example-role
+    Description: The name of the role that this CloudFormation Template will create in the home AWS account.
+  InstanceProfileNameToBeCreated:
+    Type: String
+    Default: example-instance-profile
+    Description: The name of the instance profile that this CloudFormation Template will create in the home AWS account. It will be linked to the role being created.
+  RoleToBeAssumed:
+    Type: String
+    Default: arn:aws:iam::999999999999:role/shib-dba
+    Description: The ARN of the target role that you wish to allow to be assumed in a target account.
+Resources:
+  ExampleRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: !Ref RoleNameToBeCreated
+      Policies:
+        -
+          PolicyName: "privs-to-assume-target-role"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action: "sts:AssumeRole"
+                Resource: !Ref RoleToBeAssumed
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+  ExampleInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Roles:
+        - !Ref ExampleRole
+      InstanceProfileName: !Ref InstanceProfileNameToBeCreated

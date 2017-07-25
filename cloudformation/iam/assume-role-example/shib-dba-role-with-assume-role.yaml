@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Create a role for DBAs that can be assumed with Cornell Shibboleth. See
+  https://confluence.cornell.edu/display/CLOUD/Creating+Custom+Roles+to+use+With+Shibboleth.
+  The role can also be assumed by the role given as parameter, even when that role
+  is from another AWS account.
+Parameters:
+  NameOfRoleToBeCreated:
+    Type: String
+    Default: shib-dba
+    Description: The name of the role to be created by this template. To work with Cornell Shibboleth, it must be of the form "shib-XXXX" where XXXX consists of only numbers and letters.
+  ArnOfRoleToBeAllowedToAssumeShibDba:
+    Type: String
+    Default: arn:aws:iam::111111111111:role/example-role
+    Description: The ARN of the role that you wish to allow to assume the role created by this template. This role can be from a different AWS account altogether.
+Resources:
+  DBARole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: !Ref NameOfRoleToBeCreated
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+                Federated: !Join [ "", [ "arn:aws:iam::", !Ref "AWS::AccountId", ":saml-provider/cornell_idp" ] ]
+            Action: "sts:AssumeRoleWithSAML"
+            Condition:
+              StringEquals:
+                SAML:aud: "https://signin.aws.amazon.com/saml"
+          -
+            Effect: "Allow"
+            Principal:
+                AWS: !Ref ArnOfRoleToBeAllowedToAssumeShibDba
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
+        - arn:aws:iam::aws:policy/ReadOnlyAccess
+      Policies:
+        -
+          PolicyName: "SecurityGroupFullControl"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "ec2:CreateSecurityGroup"
+                  - "ec2:DescribeSecurityGroup"
+                  - "ec2:DescribeVpcs"
+                Resource: "*"
+              -
+                Effect: "Allow"
+                Action:
+                  - "ec2:AuthorizeSecurityGroupEgress"
+                  - "ec2:AuthorizeSecurityGroupIngress"
+                  - "ec2:DeleteSecurityGroup"
+                  - "ec2:RevokeSecurityGroupEgress"
+                  - "ec2:RevokeSecurityGroupIngress"
+                Resource: !Join [ "", [ "arn:aws:ec2:us-east-1:", !Ref "AWS::AccountId", ":*" ] ]
+        -
+          PolicyName: "TagsFullControl"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "ec2:CreateTags"
+                  - "ec2:DeleteTags"
+                  - "ec2:DecribeTags"
+                Resource: !Join [ "", [ "arn:aws:ec2:us-east-1:", !Ref "AWS::AccountId", ":*" ] ]
+        -
+          PolicyName: "CloudwatchAlarmsFullControl"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "cloudwatch:DisableAlarmActions"
+                  - "cloudwatch:EnableAlarmActions"
+                  - "cloudwatch:PutMetricAlarm"
+                  - "cloudwatch:SetAlarmState"
+                  - "cloudwatch:DeleteAlarms"
+                Resource: "*"
