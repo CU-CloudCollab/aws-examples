@@ -61,6 +61,8 @@ async.waterfall([
     delete params["TableArn"];
     delete params["TableStatus"];
     delete params["ProvisionedThroughput"]["NumberOfDecreasesToday"];
+    delete params["ProvisionedThroughput"]["LastIncreaseDateTime"];
+    delete params["ProvisionedThroughput"]["LastDecreaseDateTime"];
 
 
 	if(params.hasOwnProperty("GlobalSecondaryIndexes")) {
