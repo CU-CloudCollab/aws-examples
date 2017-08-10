@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+# Convert an IAM secret access key into a SMTP password for use by SES SMTP.
+
 require 'openssl'
 require 'base64'
 require 'net/smtp'
