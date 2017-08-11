@@ -18,7 +18,7 @@ end
 # parse out the command line options
 options = {}
 OptionParser.new do |opts|
-  opts.banner = 'Convert an IAM secret access key to an SES SMTP password. Optionaly send a test email, if access_key and sender_email are provided.'
+  opts.banner = 'Convert an IAM secret access key to an SES SMTP password. Optionally send a test email, if access_key and sender_email are provided.'
               + 'Usage: iam-smtp-credentials.rb [options]'
 
   opts.on('--access_key ACCESS_KEY', 'This is the AWS API access key. Required only if you want to send a test email after the password conversion.') { |v| options[:access_key] = v }
